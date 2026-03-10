@@ -27,7 +27,7 @@ jobs:
         run: flake8 launch/ --max-line-length=120 --count --show-source --statistics
 
       - name: YAML lint — world configs
-        run: yamllint -d "{extends: relaxed, rules: {line-length: {max: 200}}}" world/
+        run: 'yamllint -d "{extends: relaxed, rules: {line-length: {max: 200}}}" world/'
 
       - name: Python syntax check
         run: python -m py_compile tb3_flatland/*.py
