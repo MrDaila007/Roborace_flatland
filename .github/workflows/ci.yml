@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches: [main, dev-roborace]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    name: Lint & Syntax
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install linters
+        run: pip install flake8 yamllint
+
+      - name: Flake8 — Python lint
+        run: flake8 tb3_flatland/ --max-line-length=120 --count --show-source --statistics
+
+      - name: Flake8 — Launch files
+        run: flake8 launch/ --max-line-length=120 --count --show-source --statistics
+
+      - name: YAML lint — world configs
+        run: yamllint -d "{extends: relaxed, rules: {line-length: {max: 200}}}" world/
+
+      - name: Python syntax check
+        run: python -m py_compile tb3_flatland/*.py
+
+  build:
+    name: ROS2 Build (Docker)
+    runs-on: ubuntu-22.04
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Flatland Docker image
+        run: docker build -t flatland-ci docker/
+
+      - name: Copy package into container and build
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}:/root/flatland_ws/src/tb3_flatland \
+            flatland-ci \
+            bash -c "source /opt/ros/humble/setup.bash && \
+                     source /root/flatland_ws/install/setup.bash && \
+                     cd /root/flatland_ws && \
+                     colcon build --packages-select tb3_flatland && \
+                     echo '=== Build OK ==='"
