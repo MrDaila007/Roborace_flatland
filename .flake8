@@ -1,0 +1,10 @@
+[flake8]
+max-line-length = 120
+extend-ignore =
+    E221,
+    W291,
+    W292,
+    W293
+per-file-ignores =
+    tb3_flatland/marker_array_publish.py: E231,E265,E302,E305,F541
+    tb3_flatland/spawn_robot.py: F541
