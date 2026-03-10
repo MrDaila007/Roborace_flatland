@@ -20,11 +20,8 @@ jobs:
       - name: Install linters
         run: pip install flake8 yamllint
 
-      - name: Flake8 — Python lint
-        run: flake8 tb3_flatland/ --max-line-length=120 --count --show-source --statistics
-
-      - name: Flake8 — Launch files
-        run: flake8 launch/ --max-line-length=120 --count --show-source --statistics
+      - name: Flake8
+        run: flake8 tb3_flatland/ launch/ --count --show-source --statistics
 
       - name: YAML lint — world configs
         run: 'yamllint -d "{extends: relaxed, rules: {line-length: {max: 200}}}" world/'
